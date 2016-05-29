@@ -1,0 +1,72 @@
+body{
+   background-color: #1c1c1c;
+}
+
+.container{
+    width: 1340px;
+    height: 1500px;
+    background-color: #1c1c1c;
+}
+.header{
+    width: 1340px;
+    height: 70px;
+    background-color: #1c2c2c;
+    text-align: center;
+    font-size: 40px;
+}
+
+.left{
+    float: left;
+    width: 660px;
+    height: 680px;
+    background-color: #1c1c1c;
+    text-align: center;
+    font-size: 40px;
+    color: white;
+}
+
+.right{
+    float: left;
+    width: 660px;
+    height: 680px;
+    background-color: #3A3A3A;
+    text-align: center;
+    font-size: 40px;
+    color: white;
+}
+
+#textfield{
+    width: 300px;
+    height: 30px
+}
+
+#button{
+    width: 90px;
+    height: 40px;
+}
+
+.exaple{
+    width: 1340px;
+    color: white;
+    text-align: center;
+    font-size: 20px;
+}
+
+.error{
+    height: 17px;
+    color:#FF0033;
+    margin-top: 5px;
+    font-size: 15px;
+}
+
+.tab{
+    width: 300px;
+    color: white;
+    font-size: 30px;
+}
+
+.plot{
+    clear: both;
+    width: 1340px;
+    height: 750px;
+}
