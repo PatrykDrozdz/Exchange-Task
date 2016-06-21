@@ -1,10 +1,67 @@
 
 <?php 
     session_start();
+     require_once 'connection.php';
+    
+     $idstart=1;
+     $idend=2;
+     
+
+                    
+                    for($i = $idstart; $i<=$idend; $i++){
+               
+                         $a2[$i] =0;
+                      $a3[$i] = 0;
+                    
+                
+                 }
+     //ściąganie dat z bazy danych
+    try{
+        
+         $valid=true;
+         $conection = new mysqli($host, $db_user, $password, $db_name);
+         
+         
+          if($conection->connect_errno!=0){
+             echo"Error: ".$conection->connect_errno;
+         }else {
+            
+            $query = "SELECT * FROM chart";
+            
+            if($valid==true){
+                
+                $result = $conection->query($query);
+                
+                $row = $result->fetch_assoc();
+                
+                $howMany = $result->num_rows;
+                 for($i=1; $i<=$howMany; $i++){
+                      $res = $conection->query("SELECT * FROM chart WHERE id = '$i'");
+                      $row2 = $res->fetch_assoc();
+                      
+                      $tabDay[$i] = $row2['Day'];
+
+                 }
+
+
+            }else{
+                throw new Exception($conection->errno);
+            }
+         }
+         
+         $conection->close();
+       
+        
+    }  catch (Exceptine $e){
+        echo'<span class="error">Błąd serwera</span>';
+        echo '</br>';
+        echo $e;
+    }
+    
     
     if(isset($_POST['date1']) && isset($_POST['date2'])){
         
-        require_once 'connection.php';
+        //require_once 'connection.php';
         
         $date1 = $_POST['date1'];
         $date2 = $_POST['date2'];
@@ -20,29 +77,11 @@
              } else {
                  
                  $valid = true;
-                 /*
-                 $checkRes = $connection->query("SELECT * FROM chart");
-                 $rowCheck = $checkRes->fetch_assoc();
-                 
-                 $how = mysqli_num_rows($checkRes);
-                 
-                 
-                 for($i=1; $i<=$how; $i++){
-                     $checkRes = $connection->query("SELECT Data FROM chart");
-                     $rowsCH = $checkRes->fetch_assoc();
-                     $dataCheck[$i] = $rowsCH['Data'];
-                     if($date1!=$dataCheck[$i] || $date2!=$dataCheck[$i]){
-                         $valid=false;
-                         $_SESSION['error_date'] = "Zła data wprowadzona!";
-                     }
-                     
-                 }
-                 */
                  
                  if($valid==true){
                 
-                 $res1 = $connection->query("SELECT * FROM chart WHERE Data='$date1'");
-                 $res2 = $connection->query("SELECT * FROM chart WHERE Data='$date2'");
+                 $res1 = $connection->query("SELECT * FROM chart WHERE Day='$date1'");
+                 $res2 = $connection->query("SELECT * FROM chart WHERE Day='$date2'");
                  
                  $row1 = $res1->fetch_assoc();
                  $row2 = $res2->fetch_assoc();
@@ -50,8 +89,12 @@
                  $idstart= $row1['id'];
                  $idend = $row2['id'];
                  
-
-           
+                 if($idstart>$idend){
+                     $befId = $idend;
+                     $idend = $idstart;
+                     $idstart = $idend;
+                 }
+                 
                     
                     for($i = $idstart; $i<=$idend; $i++){
                         
@@ -59,8 +102,8 @@
                      
                         $rows = $result->fetch_assoc();
                         
-                         $a2[$i] = $rows['Data'];
-                         $a3[$i] = $rows['Wartosci'];
+                         $a2[$i] = $rows['Day'];
+                         $a3[$i] = $rows['Value'];
                          
                         $do_wykresu[] = "['".$a2[$i]."', ".$a3[$i]."]";
 
@@ -125,35 +168,49 @@
         
     </head>
     <body>
+        <div class="plot" id="curve_chart" >
+   
+            </div>
         
         <div class="container">
             
             <div class="header">
                 <a href="compare.php">Porównywanie </a>
-                <div class="exaple"> Co wpisać - przykład;   Data: 18/12/2012</div>
+
             </div>
             <div class="left">
                 <form method="post">
                     data od:
                     <br/>
-                    <input type="text" name="date1" id="textfield"/>
+                  
                     <?php 
-                        if(isset($_SESSION['error_date'])){
-                            echo '<div class="error">'.$_SESSION['error_date'].'</div>'; 
-                            unset($_SESSION['error_date']);
-                        }
+                 
                     ?>
+                   <select name="date1" id="textfield">
+                       
+                    <?php 
+                        for($i=1; $i<=$howMany; $i++){
+                            echo '<option>'.$tabDay[$i].'</option>';
+                    }
+                    
+                    ?>    
+                    </select>
+                    
+                 
                     <br/>
                     <br/>
                     data do:
                     <br/>
-                    <input type="text" name="date2" id="textfield"/>
-                     <?php 
-                        if(isset($_SESSION['error_date'])){
-                            echo '<div class="error">'.$_SESSION['error_date'].'</div>'; 
-                            unset($_SESSION['error_date']);
-                        }
+               
+                    <select name="date2" id="textfield">
+                         
+                    <?php 
+                        for($i=1; $i<=$howMany; $i++){
+                            echo '<option>'.$tabDay[$i].'</option>';
+                    }
+                    
                     ?>
+                    </select>
                     <br/>
                     <br/>
                     <input type="submit" value="make" id="button"/>
@@ -197,9 +254,7 @@
             // id="curve_chart" - do wykresu
             ?>
             
-            <div class="plot" id="curve_chart" >
-   
-            </div>
+            
             
         </div>
         
